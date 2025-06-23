@@ -1,0 +1,23 @@
+<div class="container">
+  <app-go-back></app-go-back>
+  @if (postDetail){
+    <article class="post-detail">
+      <a routerLink="/profile/{{postDetail.userID }}"><h2>{{ postDetail.username }}</h2></a>
+      <p class="timestamp">{{ postDetail.timestamp | date:'medium' }}</p>
+        <div class="message" [innerHTML]="getSafeMessage()"></div>
+      @if (this.authService.isLoggedIn()){
+        <div class="post-actions">
+          <button (click)="this.postService.likePost(postDetail)" class="btn btn-success">👍({{ postDetail.likes }})</button>
+          <button (click)="this.postService.dislikePost(postDetail)" class="btn btn-danger">👎({{ postDetail.dislikes }})</button>
+        </div>
+      } @else {
+        <button class="btn btn-success" disabled>👍({{ postDetail.likes }})</button>
+        <button class="btn btn-danger" disabled>👎({{ postDetail.dislikes }})</button>
+      }
+    </article>
+    }
+    @if (this.authService.isLoggedIn()){
+      <app-comment></app-comment>
+    }
+    <app-feed-list></app-feed-list>
+  </div>

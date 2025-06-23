@@ -1,0 +1,29 @@
+<div class="feed">
+  @if(postService.loading){
+    <p>Loading...</p>
+  } @else {
+    @for(post of postService.posts; track postService.posts) {
+      <div class="post">
+        <a routerLink="/posts/{{ post.id }}">
+          <div class="post-header">
+            <a routerLink="/profile/{{post.userID }}"><strong>{{ post.username }}</strong></a>
+            <span class="timestamp">{{ post.timestamp | date:'short' }}</span>
+          </div>
+          <p [innerHTML]="getSafeMessage(post.message)"></p>
+        </a>
+        @if (this.authService.isLoggedIn()){
+          <div class="post-actions">
+            <button (click)="this.postService.likePost(post)" class="btn btn-success">👍({{ post.likes }})</button>
+            <button (click)="this.postService.dislikePost(post)" class="btn btn-danger">👎({{ post.dislikes }})</button>
+          </div>
+        } @else {
+          <button class="btn btn-success" disabled>👍({{ post.likes }})</button>
+          <button class="btn btn-danger" disabled>👎({{ post.dislikes }})</button>
+        }
+      </div>
+    } @empty {
+      <p>There are no items.</p>
+    }
+  }
+</div>
+

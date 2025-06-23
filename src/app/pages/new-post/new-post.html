@@ -1,0 +1,19 @@
+<div class="container">
+  <h2>New post</h2>
+  <p>{{ this.authService.getUsername() }}</p>
+
+  <button class="btn btn-primary" (click)="addLink()">Add Link</button>
+
+  <!-- Image upload input -->
+  <input type="file" accept="image/*" (change)="onImageSelected($event)" />
+
+  <!-- Preview -->
+  @if (imagePreview){
+    <img [src]="imagePreview" alt="Preview" width="200" height="200" />
+  }
+
+  <form (ngSubmit)="submitPost()">
+    <textarea [(ngModel)]="message" name="message" required></textarea>
+    <button class="btn btn-primary" type="submit">Post</button>
+  </form>
+</div>

@@ -1,0 +1,11 @@
+<div class="container">
+  <h2>Profile</h2>
+  @if (profile){
+    <h2>{{ profile.username }}</h2>
+    <p>Status: {{ profile.statusMessage }}</p>
+    <p>Website: <a [href]="profile.website" target="_blank">{{ profile.website }}</a></p>
+    <hr>
+    <app-feed-list></app-feed-list>
+  }
+</div>
+

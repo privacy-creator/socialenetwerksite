@@ -1,0 +1,40 @@
+.post-detail {
+  //max-width: 600px;
+  margin: 2rem auto;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  background-color: var(--bg-color, #fff);
+  color: var(--text-color, #222);
+}
+
+a{
+  color: white!important;
+}
+
+.timestamp {
+  font-size: 0.8rem;
+  color: #666;
+  margin-bottom: 1rem;
+}
+
+.message {
+  font-size: 1.1rem;
+  line-height: 1.5;
+}
+
+:host {
+  display: block;
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  .post-detail {
+    background-color: #222;
+    color: #eee;
+    box-shadow: 0 2px 6px rgba(255, 255, 255, 0.1);
+  }
+  .timestamp {
+    color: #aaa;
+  }
+}
