@@ -30,7 +30,7 @@ export class NewPost {
     }
 
     if (this.message.trim()) {
-      this.postService.addPost(this.message, -1).then(() => {
+      this.postService.addPost(this.message, -1, this.imagePreview).then(() => {
         this.router.navigate(['/']).then();
       });
     }

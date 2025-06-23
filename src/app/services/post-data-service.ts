@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import {AuthService} from './auth-service';
 import {Router} from '@angular/router';
-// import { EncryptionService } from './encryption.service';
 
 @Injectable({
   providedIn: 'root',
@@ -12,13 +11,15 @@ export class PostDataService {
 
   constructor(protected readonly authService: AuthService, private router: Router) {}
 
-  async addPost(message: string, pid?: number): Promise<void> {
+  async addPost(message: string, pid?: number, images?: any): Promise<void> {
     const payload = {
       userID: this.authService.getUserID(),
       message: message,
       pid: pid,
+      images: images,
     };
 
+    console.log(payload);
     await fetch('https://sociaal.hiddebalestra.nl/add_post.php', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -41,6 +42,7 @@ export class PostDataService {
         decryptedPosts.push({
           id: post.id,
           message: post.message,
+          images: post.images,
           username: post.username,
           userID: post.userID,
           timestamp: post.timestamp,
@@ -64,6 +66,7 @@ export class PostDataService {
     return {
       id: post.id,
       message: post.message,
+      images: post.images,
       username: post.username,
       userID: post.userID,
       timestamp: post.timestamp,

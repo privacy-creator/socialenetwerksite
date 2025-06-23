@@ -10,6 +10,9 @@
             <span class="timestamp">{{ post.timestamp | date:'short' }}</span>
           </div>
           <p [innerHTML]="getSafeMessage(post.message)"></p>
+          @if (post.images){
+            <img [src]="post.images" alt="Preview" width="200" height="200" />
+          }
         </a>
         @if (this.authService.isLoggedIn()){
           <div class="post-actions">

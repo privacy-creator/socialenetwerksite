@@ -5,6 +5,9 @@
       <a routerLink="/profile/{{postDetail.userID }}"><h2>{{ postDetail.username }}</h2></a>
       <p class="timestamp">{{ postDetail.timestamp | date:'medium' }}</p>
         <div class="message" [innerHTML]="getSafeMessage()"></div>
+        @if (postDetail.images){
+          <img [src]="postDetail.images" alt="Preview" width="200" height="200" />
+        }
       @if (this.authService.isLoggedIn()){
         <div class="post-actions">
           <button (click)="this.postService.likePost(postDetail)" class="btn btn-success">👍({{ postDetail.likes }})</button>
