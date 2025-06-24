@@ -7,7 +7,10 @@ import {Router} from '@angular/router';
 })
 export class PostDataService {
   posts: any[] = [];
+  loaded: boolean = false;
   loading = true;
+  selectedImage: string | null = null;
+  showImageModal = false;
 
   constructor(protected readonly authService: AuthService, private router: Router) {}
 
@@ -30,9 +33,9 @@ export class PostDataService {
   private async getPosts(id?:number): Promise<any[]> {
     let res= null;
     if (id){
-      res = await fetch(`https://sociaal.hiddebalestra.nl/get_posts.php?id=${id}`);
+      res = await fetch(`https://sociaal.hiddebalestra.nl/get_posts.php?id=${id}&viewerID=${this.authService.getUserID()}`);
     } else {
-      res = await fetch('https://sociaal.hiddebalestra.nl/get_posts.php');
+      res = await fetch(`https://sociaal.hiddebalestra.nl/get_posts.php?viewerID=${this.authService.getUserID()}`);
     }
     const posts = await res.json();
 
@@ -46,11 +49,12 @@ export class PostDataService {
           username: post.username,
           userID: post.userID,
           timestamp: post.timestamp,
+          comments: post.comments,
           likes: post.likes,
           dislikes: post.dislikes
         });
       } catch (e) {
-        console.error('Fout bij ontsleutelen:', e);
+        console.error('Fout bij:', e);
       }
     }
 
@@ -70,13 +74,20 @@ export class PostDataService {
       username: post.username,
       userID: post.userID,
       timestamp: post.timestamp,
+      comments: post.comments,
       likes: post.likes,
       dislikes: post.dislikes,
     };
   }
 
-  private async getPostsByUser(userID: number): Promise<any[]> {
-    const res = await fetch(`https://sociaal.hiddebalestra.nl/get_user_posts.php?userID=${userID}`);
+  private async getPostsByUser(profileID: number, userID?: number): Promise<any[]> {
+    const res = await fetch(`https://sociaal.hiddebalestra.nl/get_user_posts.php?userID=${userID}&profileID=${profileID}`);
+    return await res.json();
+  }
+
+  private async getFollowedPosts(): Promise<any[]> {
+    const userID = this.authService.getUserID();
+    const res = await fetch(`https://sociaal.hiddebalestra.nl/get_followed_posts.php?userID=${userID}`);
     return await res.json();
   }
 
@@ -146,17 +157,21 @@ export class PostDataService {
       });
   }
 
-  async getThePosts(postId?: number) {
+  // @ts-ignore
+  async getThePosts(postId?: number): Promise<any[]> {
     this.posts = [];
     this.loading = true;
     try {
       if (this.router.url.includes('/profile/')) {
         if (!postId) {
+          // @ts-ignore
           return;
         }
-        this.posts = await this.getPostsByUser(postId);
-      } else if (this.router.url.includes('/profile')) {
-        this.posts = await this.getPostsByUser(parseInt(this.authService.getUserID()));
+        this.posts = await this.getPostsByUser(postId!, parseInt(this.authService.getUserID()));
+      }else if (this.router.url.includes('/profile')) {
+        this.posts = await this.getPostsByUser(parseInt(this.authService.getUserID()),parseInt(this.authService.getUserID()));
+      } else if (this.router.url.includes('/followers')) {
+        this.posts = await this.getFollowedPosts();
       } else {
         if (!postId) {
           this.posts = await this.getPosts();
@@ -166,11 +181,22 @@ export class PostDataService {
       }
 
       this.posts.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+      this.loaded = true;
     } catch (error) {
       console.error('Fout bij ophalen posts:', error);
     } finally {
       this.loading = false;
     }
+  }
+
+  openImage(url: string) {
+    this.selectedImage = url;
+    this.showImageModal = true;
+  }
+
+  closeImage() {
+    this.showImageModal = false;
+    this.selectedImage = null;
   }
 }
 

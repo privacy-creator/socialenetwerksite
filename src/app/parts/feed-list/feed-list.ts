@@ -1,36 +1,48 @@
 import { Component, OnInit } from '@angular/core';
 import { DatePipe } from '@angular/common';
-import {ActivatedRoute, ParamMap, Router, RouterLink} from '@angular/router';
+import {Router, ActivatedRoute, RouterLink, NavigationEnd} from '@angular/router';
 import {PostDataService} from '../../services/post-data-service';
 import {AuthService} from '../../services/auth-service';
 import {SafeHtml, DomSanitizer} from '@angular/platform-browser';
+import {ImageDetail} from '../image-detail/image-detail';
 
 @Component({
   standalone: true,
   selector: 'app-feed-list',
-  imports: [DatePipe, RouterLink],
+  imports: [DatePipe, RouterLink, ImageDetail],
   templateUrl: './feed-list.html',
   styleUrls: ['./feed-list.scss']
 })
 export class FeedList implements OnInit {
-
   constructor(
     protected readonly postService: PostDataService,
     protected readonly authService: AuthService,
-    private router: Router,
     public route: ActivatedRoute,
+    public router: Router,
     private sanitizer: DomSanitizer,
   ) {}
+  lastPage: string | undefined;
 
   async ngOnInit() {
-    if (this.router.url.includes('/posts/') || this.router.url.includes('/profile/') ) {
-      this.route.paramMap.subscribe(async (params: ParamMap) => {
-        const idParam = params.get('id');
-        const postId = idParam ? +idParam : 0;
-        await this.postService.getThePosts(postId);
-      });
-    } else {
-      await this.postService.getThePosts();
+    const id = this.route.snapshot.paramMap.get('id');
+
+    this.router.events.subscribe((val) => {
+      if (val instanceof NavigationEnd) {
+        if (this.router.url.includes('/profile') || this.router.url.includes('/followers') || this.router.url.includes('/posts/') || this.router.url == "/") {
+          if (this.router.url != this.lastPage) {
+            this.lastPage = this.router.url;
+            this.postService.loaded = false;
+          }
+        }
+      }
+    });
+
+    if (!this.postService.loaded){
+      if (id != null){
+        await this.postService.getThePosts(Number(id));
+      } else {
+        await this.postService.getThePosts();
+      }
     }
   }
 

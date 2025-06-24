@@ -1,0 +1,12 @@
+@if (requests.length > 0){
+  <h3>Volgverzoeken</h3>
+  <ul>
+    @for (r of requests; track r.requester_id) {
+      <li>
+        {{ r.username }}
+        <button (click)="approve(r.requester_id)">Toestaan</button>
+      </li>
+    }
+  </ul>
+}
+

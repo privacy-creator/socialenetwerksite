@@ -1,0 +1,7 @@
+<!--@if (imagePreview){-->
+<!--  <img [src]="imagePreview" alt="Preview" width="200" height="200" />-->
+<!--}-->
+<div class="image-modal" (click)="onClose()">
+  <img [src]="imageUrl" alt="Detailed Image" (click)="$event.stopPropagation()" />
+  <button class="close-button" (click)="onClose()">×</button>
+</div>

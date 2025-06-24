@@ -6,14 +6,20 @@
       <p class="timestamp">{{ postDetail.timestamp | date:'medium' }}</p>
         <div class="message" [innerHTML]="getSafeMessage()"></div>
         @if (postDetail.images){
-          <img [src]="postDetail.images" alt="Preview" width="200" height="200" />
+          <img [src]="postDetail.images" alt="Preview" class="preview" (click)="this.postService.openImage(postDetail.images)" />
+          @if (this.postService.showImageModal){
+            <app-image-detail [imageUrl]="this.postService.selectedImage" (close)="this.postService.closeImage()"></app-image-detail>
+          }
         }
+      <br>
       @if (this.authService.isLoggedIn()){
         <div class="post-actions">
+          <button disabled class="btn btn-primary">💬({{postDetail.comments}})</button>
           <button (click)="this.postService.likePost(postDetail)" class="btn btn-success">👍({{ postDetail.likes }})</button>
           <button (click)="this.postService.dislikePost(postDetail)" class="btn btn-danger">👎({{ postDetail.dislikes }})</button>
         </div>
       } @else {
+        <button disabled class="btn btn-primary">💬({{postDetail.comments}})</button>
         <button class="btn btn-success" disabled>👍({{ postDetail.likes }})</button>
         <button class="btn btn-danger" disabled>👎({{ postDetail.dislikes }})</button>
       }

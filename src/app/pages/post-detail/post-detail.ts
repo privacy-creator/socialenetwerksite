@@ -8,6 +8,7 @@ import {FormsModule} from '@angular/forms';
 import {FeedList} from '../../parts/feed-list/feed-list';
 import {Comment} from '../../parts/comment/comment';
 import {SafeHtml, DomSanitizer} from '@angular/platform-browser';
+import {ImageDetail} from '../../parts/image-detail/image-detail';
 
 @Component({
   selector: 'app-post-detail',
@@ -19,7 +20,8 @@ import {SafeHtml, DomSanitizer} from '@angular/platform-browser';
     FormsModule,
     FeedList,
     Comment,
-    RouterLink
+    RouterLink,
+    ImageDetail
   ],
   providers: [DatePipe]
 })

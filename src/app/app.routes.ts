@@ -6,12 +6,14 @@ import {Login} from './pages/login/login';
 import {Register} from './pages/register/register';
 import {AuthGuard} from './auth-guard';
 import {Profile} from './pages/profile/profile';
+import {FollowPosts} from './pages/follow-posts/follow-posts';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent },
 
   { path: 'posts/new', component: NewPost, canActivate: [AuthGuard] },
   { path: 'posts/:id', component: PostDetail },
+  { path: 'followers', component: FollowPosts },
   { path: 'profile', component: Profile },
   { path: 'profile/:id', component: Profile },
 

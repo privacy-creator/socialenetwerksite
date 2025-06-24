@@ -11,10 +11,13 @@
         </li>
         @if (this.authService.isLoggedIn()){
           <li class="nav-item">
-            <a class="nav-link" aria-current="page" routerLink="/posts/new">New post</a>
+            <a class="nav-link" aria-current="page" routerLink="/followers">Follows</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" aria-current="page" routerLink="/profile">Profile</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" aria-current="page" routerLink="/posts/new">New post</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" (click)="this.authService.logout()">Logout</a>

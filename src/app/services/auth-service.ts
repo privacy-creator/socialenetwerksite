@@ -29,7 +29,6 @@ export class AuthService {
   logout(): void {
     localStorage.removeItem('jwt');
     clearTimeout(this.logoutTimeout);
-    // this.router.navigate(['/login']);
   }
 
   private parseToken(token: string): any {

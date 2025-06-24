@@ -4,6 +4,22 @@
     <h2>{{ profile.username }}</h2>
     <p>Status: {{ profile.statusMessage }}</p>
     <p>Website: <a [href]="profile.website" target="_blank">{{ profile.website }}</a></p>
+    <p>Followers: {{ profile.followers }}</p>
+
+    @if (authService.isLoggedIn()){
+      @if (authService.getUserID() !== profile.id) {
+        <button (click)="toggleFollow()" class="btn"
+                [ngClass]="isFollowing ? 'btn-danger' : 'btn-primary'">
+          {{ isFollowing ? 'Unfollow' : 'Follow' }}
+        </button>
+        @if (followStatus){
+          <p>{{ followStatus }}</p>
+        }
+      } @else {
+        <app-follow-requests></app-follow-requests>
+      }
+    }
+
     <hr>
     <app-feed-list></app-feed-list>
   }

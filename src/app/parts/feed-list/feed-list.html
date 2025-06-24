@@ -4,22 +4,26 @@
   } @else {
     @for(post of postService.posts; track postService.posts) {
       <div class="post">
-        <a routerLink="/posts/{{ post.id }}">
           <div class="post-header">
             <a routerLink="/profile/{{post.userID }}"><strong>{{ post.username }}</strong></a>
             <span class="timestamp">{{ post.timestamp | date:'short' }}</span>
           </div>
-          <p [innerHTML]="getSafeMessage(post.message)"></p>
+          <p [innerHTML]="getSafeMessage(post.message)" routerLink="/posts/{{ post.id }}"></p>
           @if (post.images){
-            <img [src]="post.images" alt="Preview" width="200" height="200" />
+            <img [src]="post.images" alt="Preview" class="preview" (click)="this.postService.openImage(post.images)" />
+            @if (this.postService.showImageModal){
+              <app-image-detail [imageUrl]="this.postService.selectedImage" (close)="this.postService.closeImage()"></app-image-detail>
+            }
           }
-        </a>
+          <br>
         @if (this.authService.isLoggedIn()){
           <div class="post-actions">
+            <button disabled class="btn btn-primary">💬({{post.comments}})</button>
             <button (click)="this.postService.likePost(post)" class="btn btn-success">👍({{ post.likes }})</button>
             <button (click)="this.postService.dislikePost(post)" class="btn btn-danger">👎({{ post.dislikes }})</button>
           </div>
         } @else {
+          <button disabled class="btn btn-primary">💬({{post.comments}})</button>
           <button class="btn btn-success" disabled>👍({{ post.likes }})</button>
           <button class="btn btn-danger" disabled>👎({{ post.dislikes }})</button>
         }

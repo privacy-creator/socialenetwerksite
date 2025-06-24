@@ -12,7 +12,7 @@ import {Router} from '@angular/router';
   styleUrl: './login.scss'
 })
 export class Login {
-  username = '';
+  UUID = '';
   password = '';
   error = '';
 
@@ -26,7 +26,7 @@ export class Login {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          username: this.username,
+          UUID: this.UUID,
           password: this.password,
         }),
       });

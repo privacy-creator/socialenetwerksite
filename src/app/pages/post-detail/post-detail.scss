@@ -6,6 +6,10 @@
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
   background-color: var(--bg-color, #fff);
   color: var(--text-color, #222);
+
+  img{
+    width: 25%;
+  }
 }
 
 a{
