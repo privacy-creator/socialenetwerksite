@@ -4,13 +4,16 @@ import {AuthService} from '../../services/auth-service';
 import {FeedList} from '../../parts/feed-list/feed-list';
 import {NgClass} from '@angular/common';
 import {FollowRequests} from './follow-requests/follow-requests';
+import {FormsModule} from '@angular/forms';
+import {CaptchaService} from '../../services/captcha-service';
 
 @Component({
   selector: 'app-profile',
   imports: [
     FeedList,
     NgClass,
-    FollowRequests
+    FollowRequests,
+    FormsModule
   ],
   templateUrl: './profile.html',
   styleUrl: './profile.scss'
@@ -18,7 +21,8 @@ import {FollowRequests} from './follow-requests/follow-requests';
 export class Profile implements OnInit{
   constructor(
     private route: ActivatedRoute,
-    public authService: AuthService
+    public authService: AuthService,
+    protected readonly captchaService: CaptchaService,
   ) {}
 
   profile: any;
@@ -30,6 +34,7 @@ export class Profile implements OnInit{
     const userId = profileId ?? String(this.authService.getUserID());
     this.loadProfile(userId);
     this.checkFollowing(userId);
+    this.captchaService.generateCaptcha();
   }
 
   loadProfile(userId: string | null): void {
@@ -85,17 +90,60 @@ export class Profile implements OnInit{
         }
       })
       .catch(() => this.followStatus = 'Fout bij volgen/verzoek.');
-    // fetch(url, {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({
-    //     follower_id: this.authService.getUserID(),
-    //     followed_id: this.profile.id
-    //   })
-    // })
-    //   .then(() => {
-    //     this.isFollowing = !this.isFollowing;
-    //   })
-    //   .catch(err => console.error('Fout bij volgen/ontvolgen:', err));
   }
+
+  updateProfile(): void {
+    if (this.captchaService.userCaptchaInput !== this.captchaService.captchaAnswer) {
+      alert('CAPTCHA. Forbidden for Robot Jetten.');
+      this.captchaService.generateCaptcha();
+      return;
+    }
+
+    // Add https:// if not present
+    if (this.profile.website && !this.profile.website.startsWith('https://')) {
+      this.profile.website = 'https://' + this.profile.website;
+    }
+
+    // Validate the URL format
+    if (!this.isValidUrl(this.profile.website)) {
+      this.followStatus = 'Ongeldige URL.';
+      return;
+    }
+
+    fetch('https://sociaal.hiddebalestra.nl/update_profile.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        userID: this.authService.getUserID(),
+        statusMessage: this.profile.statusMessage,
+        website: this.profile.website,
+        private: this.profile.private ? 1 : 0,
+        captchaInput: this.captchaService.userCaptchaInput,
+        captchaAnswer: this.captchaService.captchaAnswer
+      })
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          this.followStatus = 'Profiel bijgewerkt.';
+          this.captchaService.generateCaptcha();
+          this.captchaService.userCaptchaInput = "";
+        } else {
+          this.followStatus = 'Fout bij bijwerken profiel.';
+        }
+      })
+      .catch(() => {
+        this.followStatus = 'Fout bij bijwerken profiel.';
+      });
+  }
+
+  private isValidUrl(url: string): boolean {
+    try {
+      const parsed = new URL(url);
+      return parsed.protocol === 'https:' && !!parsed.hostname;
+    } catch {
+      return false;
+    }
+  }
+
 }

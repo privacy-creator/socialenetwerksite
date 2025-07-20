@@ -1,22 +1,43 @@
 <div class="container">
   <h2>Profile</h2>
-  @if (profile){
-    <h2>{{ profile.username }}</h2>
-    <p>Status: {{ profile.statusMessage }}</p>
-    <p>Website: <a [href]="profile.website" target="_blank">{{ profile.website }}</a></p>
-    <p>Followers: {{ profile.followers }}</p>
 
-    @if (authService.isLoggedIn()){
-      @if (authService.getUserID() !== profile.id) {
-        <button (click)="toggleFollow()" class="btn"
-                [ngClass]="isFollowing ? 'btn-danger' : 'btn-primary'">
+  @if (profile) {
+    <h2>{{ profile.username }}</h2>
+
+    @if (authService.getUserID() === profile.id) {
+      <form (ngSubmit)="updateProfile()" #form="ngForm" novalidate>
+        <label>Status:</label>
+        <input [(ngModel)]="profile.statusMessage" name="status" class="form-control"/>
+
+        <label>Website:</label>
+        <input [(ngModel)]="profile.website" name="website" class="form-control"/>
+
+        <label><input type="checkbox" [(ngModel)]="profile.private" name="private"/> Privé-profiel</label>
+        <br>
+
+        <label>{{ this.captchaService.captchaQuestion }}</label>
+        <input type="text" [(ngModel)]="this.captchaService.userCaptchaInput" name="captcha" class="form-control" required>
+
+        <button class="btn btn-success mt-2" [disabled]="!form.form.valid">Opslaan</button>
+      </form>
+      <p>Followers: {{ profile.followers }}</p>
+      @if (followStatus) {
+        <p>{{ followStatus }}</p>
+      }
+
+      <app-follow-requests></app-follow-requests>
+    } @else {
+      <p>Status: {{ profile.statusMessage }}</p>
+      <p>Website: <a [href]="profile.website" target="_blank">{{ profile.website }}</a></p>
+      <p>Followers: {{ profile.followers }}</p>
+
+      @if (authService.isLoggedIn()) {
+        <button (click)="toggleFollow()" class="btn" [ngClass]="isFollowing ? 'btn-danger' : 'btn-primary'">
           {{ isFollowing ? 'Unfollow' : 'Follow' }}
         </button>
-        @if (followStatus){
+        @if (followStatus) {
           <p>{{ followStatus }}</p>
         }
-      } @else {
-        <app-follow-requests></app-follow-requests>
       }
     }
 
@@ -24,4 +45,3 @@
     <app-feed-list></app-feed-list>
   }
 </div>
-

@@ -14,32 +14,41 @@ import {ImageDetail} from '../image-detail/image-detail';
   styleUrls: ['./feed-list.scss']
 })
 export class FeedList implements OnInit {
+  lastPage: string | undefined;
+
   constructor(
     protected readonly postService: PostDataService,
     protected readonly authService: AuthService,
     public route: ActivatedRoute,
     public router: Router,
     private sanitizer: DomSanitizer,
-  ) {}
-  lastPage: string | undefined;
-
-  async ngOnInit() {
-    const id = this.route.snapshot.paramMap.get('id');
-
+  ) {
+    let id = this.route.snapshot.paramMap.get('id');
     this.router.events.subscribe((val) => {
       if (val instanceof NavigationEnd) {
         if (this.router.url.includes('/profile') || this.router.url.includes('/followers') || this.router.url.includes('/posts/') || this.router.url == "/") {
+          console.log(Number(id));
           if (this.router.url != this.lastPage) {
+            id = this.route.snapshot.paramMap.get('id');
             this.lastPage = this.router.url;
             this.postService.loaded = false;
+            this.loadPosts(Number(id));
           }
         }
       }
     });
 
-    if (!this.postService.loaded){
-      if (id != null){
-        await this.postService.getThePosts(Number(id));
+    this.loadPosts(Number(id));
+  }
+
+  ngOnInit() {
+
+  }
+
+  async loadPosts(postId: number) {
+    if (!this.postService.loaded) {
+      if (postId != null) {
+        await this.postService.getThePosts(postId);
       } else {
         await this.postService.getThePosts();
       }
@@ -48,20 +57,29 @@ export class FeedList implements OnInit {
 
   // Method to convert URLs in text to clickable links
   getSafeMessage(post: string): SafeHtml {
-    if (!post) {
-      return '';
-    }
+    if (!post) return '';
 
-    // Regular expression to match URLs (including .nl, .com, etc.)
-    const urlRegex = /(https?:\/\/[^\s<]+(?:\.nl|\.com|\.org|\.net|\.edu|\.gov|\.co|\.io|\.biz|[^\s<]+))/g;
+    let escaped = post
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
 
-    // Replace URLs with anchor tags
-    const formattedMessage = post.replace(
-      urlRegex,
-      (url: string) => `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`
+    escaped = escaped.replace(/\n{2,}/g, '\n\n');
+    escaped = escaped.replace(/\n/g, '<br>');
+
+    const wordList = escaped.trim().split(/\s+/);
+    const isTruncated = wordList.length > 150;
+
+    const visibleText = wordList.slice(0, 150).join(' ');
+
+    const urlRegex = /(https?:\/\/[^\s<]+)/g;
+    let formatted = visibleText.replace(urlRegex, url =>
+      `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`
     );
 
-    // Sanitize the HTML to prevent XSS attacks
-    return this.sanitizer.bypassSecurityTrustHtml(formattedMessage);
+    if (isTruncated) {
+      formatted += `<br>... <strong>Read more</strong>`;
+    }
+
+    return this.sanitizer.bypassSecurityTrustHtml(formatted);
   }
 }

@@ -13,7 +13,8 @@
   }
 
   <form (ngSubmit)="submitPost()">
-    <textarea [(ngModel)]="message" name="message" required></textarea>
+    <textarea [(ngModel)]="message" name="message" required rows="6"
+              placeholder="Typ je bericht hier met alineas (Enter voor nieuwe regel)..."></textarea>
     <button class="btn btn-primary" type="submit">Post</button>
   </form>
 </div>

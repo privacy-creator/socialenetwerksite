@@ -48,20 +48,23 @@ export class PostDetail implements OnInit {
 
   // Method to convert URLs in text to clickable links
   getSafeMessage(): SafeHtml {
-    if (!this.postDetail?.message) {
-      return '';
-    }
+    if (!this.postDetail) return '';
 
-    // Regular expression to match URLs (including .nl, .com, etc.)
-    const urlRegex = /(https?:\/\/[^\s<]+(?:\.nl|\.com|\.org|\.net|\.edu|\.gov|\.co|\.io|\.biz|[^\s<]+))/g;
+    // Escape HTML om XSS te voorkomen
+    let escaped = this.postDetail.message
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
 
-    // Replace URLs with anchor tags
-    const formattedMessage = this.postDetail.message.replace(
-      urlRegex,
-      (url: string) => `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`
+    // Reduceer meerdere witregels tot één
+    escaped = escaped.replace(/\n{2,}/g, '\n\n');
+
+    // Zet \n om naar <br>
+    escaped = escaped.replace(/\n/g, '<br>');
+    const urlRegex = /(https?:\/\/[^\s<]+)/g;
+    const withLinks = escaped.replace(urlRegex, (url: any) =>
+      `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`
     );
 
-    // Sanitize the HTML to prevent XSS attacks
-    return this.sanitizer.bypassSecurityTrustHtml(formattedMessage);
+    return this.sanitizer.bypassSecurityTrustHtml(withLinks);
   }
 }

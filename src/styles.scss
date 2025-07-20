@@ -12,7 +12,11 @@ a{
 
 @media (prefers-color-scheme: dark) {
   body {
-    background-color: #121212;
-    color: #eee;
+    background-color: #121212!important;
+    color: #eee !important;
+  }
+
+  a{
+    color: #eee !important;
   }
 }

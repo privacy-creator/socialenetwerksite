@@ -29,6 +29,7 @@ export class AuthService {
   logout(): void {
     localStorage.removeItem('jwt');
     clearTimeout(this.logoutTimeout);
+    location.reload();
   }
 
   private parseToken(token: string): any {
